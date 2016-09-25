@@ -19,7 +19,7 @@ function defineProperty(propertyName) {
     });
 }
 
-defineProperty('supeSecret');
+defineProperty('superSecret');
 defineProperty('users');
 
 app.post('/authenticate', (req, res, next) => {
