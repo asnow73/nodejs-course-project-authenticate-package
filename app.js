@@ -24,32 +24,31 @@ defineProperty('users');
 
 app.post('/authenticate', (req, res, next) => {
     let data = req.body;
-    app.users.findByName(data.name, function (err, user) {
-        if (err) {
-            next(err);
+    app.users.findByName(data.name).then((user) => {
+
+        if (!user) {
+            res.send({success: false, message: 'Authentication failed. User not found.'});
         } else {
-            if (!user) {
-                res.send({success: false, message: 'Authentication failed. User not found.'});
+            // check if password matches
+            if (user.password != req.body.password) {
+                res.send({success: false, message: 'Authentication failed. Wrong password.'});
             } else {
-                // check if password matches
-                if (user.password != req.body.password) {
-                    res.send({success: false, message: 'Authentication failed. Wrong password.'});
-                } else {
 
-                    // if user is found and password is right
-                    // create a token
-                    var token = jwt.sign(user, app.superSecret);
+                // if user is found and password is right
+                // create a token
+                var token = jwt.sign(user, app.superSecret);
 
-                    // return the information including token as JSON
-                    res.send({
-                        success: true,
-                        message: 'Enjoy your token!',
-                        token: token
-                    });
-                }
-
+                // return the information including token as JSON
+                res.send({
+                    success: true,
+                    message: 'Enjoy your token!',
+                    token: token
+                });
             }
+
         }
+    }, (err) => {
+        next(err);
     });
 });
 
